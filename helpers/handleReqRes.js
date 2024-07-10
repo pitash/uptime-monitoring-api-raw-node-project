@@ -9,6 +9,7 @@ const url = require('url');
 const { StringDecoder } = require('string_decoder');
 const routes = require('../routes');
 const { notFoundHandler } = require('../handlers/routeHandlers/notFoundHandler');
+const { parseJSON } = require('../helpers/utilities');
 
 // modue scaffolding
 const handler = {};
@@ -38,15 +39,17 @@ handler.handleReqRes = (req, res) => {
 
     const chosenHandler = routes[trimmedPath] ? routes[trimmedPath] : notFoundHandler;
 
-    chosenHandler(requestProperties, (statusCode, payload) => {
-        statusCode = typeof statusCode === 'number' ? statusCode : 500;
-        payload = typeof payload === 'object' ? payload : {};
+    //it works normaly well but when data come from request method then dont work this way.
 
-        const payloadString = JSON.stringify(payload);
+    // chosenHandler(requestProperties, (statusCode, payload) => {
+    //     statusCode = typeof statusCode === 'number' ? statusCode : 500;
+    //     payload = typeof payload === 'object' ? payload : {};
+
+    //     const payloadString = JSON.stringify(payload);
         
-        res.writeHead(statusCode);
-        res.end(payloadString);
-    });
+    //     res.writeHead(statusCode);
+    //     res.end(payloadString);
+    // });
 
     req.on('data', (buffer) => {
         realData += decoder.write(buffer);
@@ -54,12 +57,27 @@ handler.handleReqRes = (req, res) => {
 
     req.on('end', () => {
         realData += decoder.end();
+
+        requestProperties.body = parseJSON(realData);
+
+        chosenHandler(requestProperties, (statusCode, payload) => {
+            statusCode = typeof statusCode === 'number' ? statusCode : 500;
+            payload = typeof payload === 'object' ? payload : {};
+    
+            const payloadString = JSON.stringify(payload);
+            
+            // retun the final Response
+            res.setHeader('Content-Type', 'application/json'); 
+            res.writeHead(statusCode);
+            res.end(payloadString);
+        });
         
         
 
-        console.log(realData);
+        //when chosenHandler out of the req.on function
+        // console.log(realData);
         // response handle
-        res.end('Hello world');
+        // res.end('Hello world');
     });
 
     
