@@ -8,36 +8,13 @@ const http = require('http');
 const { handleReqRes } = require('./helpers/handleReqRes');
 const environment = require('./helpers/environments');
 const data = require('./lib/data');
+const { sendTwilioSms } = require('./helpers/notifications');
 
 // app object - module scaffolding
 const app = {};
 
 
-//testing file system
 
-// data.create('test', 'newFile', { name: 'bd', language: 'bangla' }, (err) => {
-//     if (err) {
-//         console.error('An error occurred:', err);
-//     } else {
-//         console.log('File created successfully');
-//     }
-// });
-
-// data.read('test', 'newFile', (err, result) => {
-//     console.log(err, result);
-// });
-
-// data.update('test', 'newFile', { name: 'Japan', language: 'Japanies' }, (err) => {
-//     if (err) {
-//         console.error('An error occurred:', err);
-//     } else {
-//         console.log('File update successfully');
-//     }
-// });
-
-// data.delete('test', 'newFile', (err) => {
-//     console.log(err);
-// });
 
 // configuration
 app.config = {
